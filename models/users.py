@@ -14,3 +14,5 @@ class User(SQLModel, table=True):
     username: str = Field(index=True, unique=True)
     password: str
     role: UserRole
+
+    enrollments: List["Enrollment"] = Relationship(back_populates="student")
