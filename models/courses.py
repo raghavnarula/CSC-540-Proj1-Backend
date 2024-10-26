@@ -11,7 +11,6 @@ class Course(SQLModel, table=True):
     # Foreign keys referencing the User table
     faculty_member_id: str
     ta_id: str
-
     start_date: str  
     end_date: str
     unique_token: str

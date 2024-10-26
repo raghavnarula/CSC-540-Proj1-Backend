@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from .routers import users,courses,login
+from .routers import users,courses,login,textbooks
 from typing import Annotated
 from .database import *
 
@@ -16,6 +16,7 @@ def on_startup():
 app.include_router(login.router)
 app.include_router(users.router)
 app.include_router(courses.router)
+app.include_router(textbooks.router)
 
 # Root endpoint
 @app.get("/")

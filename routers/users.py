@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException #type:ignore
+from fastapi import APIRouter, Depends, HTTPException, Request #type:ignore
 from sqlmodel import Session, select, SQLModel, Field # type: ignore
 from ..database import get_session
 from ..models import users
@@ -11,7 +11,6 @@ def create_user(user: users.User, session: Session = Depends(get_session)):
     existing_user = session.exec(select(users.User).where(users.User.username == user.username)).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
     session.add(user)
     session.commit()
     session.refresh(user)

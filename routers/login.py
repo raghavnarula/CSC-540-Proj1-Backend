@@ -12,10 +12,9 @@ def login(username: str, password: str, response: Response, session: Session = D
     ).first()
     
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login Incorrect")
     
     # Set cookies with the user's role and ID if authentication is successful
     response.set_cookie(key="user_role", value=user.role, httponly=True, samesite="Lax")
     response.set_cookie(key="user_id", value=str(user.id), httponly=True, samesite="Lax")
-    
-    return {"message": f"Welcome {username}!"}
+    return {"message": "Success"}, 200
