@@ -17,5 +17,6 @@ class User(SQLModel, table=True):
     role: UserRole
     FirstName: str
     LastName: str
+    email_id: str
     CreationDate: datetime = Field(default_factory=datetime.utcnow)
     enrollments: List["Enrollment"] = Relationship(back_populates="student")
