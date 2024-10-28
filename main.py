@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from fastapi import FastAPI, Depends, HTTPException #type:ignore
+from sqlmodel import Field, Session, SQLModel, create_engine, select #type:ignore
 from .routers import users,courses,login,textbooks
 from typing import Annotated
 from .database import *

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status #type:ignore
 from sqlmodel import Session, select #type:ignore
 from ..database import get_session
-from ..models.textbook import textbooks  # Assuming textbooks is the module with the Textbook model
+from ..models import textbooks  # Assuming textbooks is the module with the Textbook model
 
 router = APIRouter()
 
