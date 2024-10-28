@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request #type:ignore
+from fastapi import APIRouter, Depends, HTTPException,Query,Request #type:ignore
 from sqlmodel import Session, select, SQLModel, Field # type: ignore
 from ..database import get_session
 from ..models import users
@@ -6,8 +6,8 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/users/", response_model=users.User,tags=['users'])
-def create_user(user: users.User, session: Session = Depends(get_session)):
+@router.post("/users/",response_model=users.User,tags=['users'])
+def create_user(user: users.User,  role:str = Query("admin"),session: Session = Depends(get_session)):
     # Check if username already exists
     existing_user = session.exec(select(users.User).where(users.User.username == user.username)).first()
     if existing_user:
@@ -19,6 +19,7 @@ def create_user(user: users.User, session: Session = Depends(get_session)):
     # Assign the generated ID and the creation date to the user
     user.id = user_id
     user.CreationDate = current_date
+    user.role = role
     
     session.add(user)
     session.commit()
