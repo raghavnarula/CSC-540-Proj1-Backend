@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException,Cookie #type:ignore
 from sqlmodel import Session, select, SQLModel, Field # type: ignore
+from datetime import datetime
 from ..database import get_session
 from ..models import courses, users, enrollment
 
@@ -181,3 +182,38 @@ def add_enrollment(course_id: str, student_id: str, session: Session = Depends(g
     session.refresh(new_enrollment)
 
     return {"message": "Enrollment request submitted successfully", "student_id": student_id, "course_id": course_id}
+
+# Add TA 
+@router.put("/courses/{course_id}/add-ta", response_model=dict, tags=["courses"])
+def add_ta_to_course(
+    course_id: str,
+    first_name: str,
+    last_name: str,
+    email: str,
+    default_password: str,
+    session: Session = Depends(get_session)
+):
+    current_date = datetime.now()
+    user_id = f"{first_name[:2].capitalize()}{last_name[:2].capitalize()}{current_date.strftime('%m%y')}"
+
+    new_ta = users.User(
+        id=user_id,
+        username=email,
+        password=default_password,  
+        role="ta"
+    )
+
+    session.add(new_ta)
+    session.commit()
+    session.refresh(new_ta)
+
+    course = session.exec(select(courses.Course).where(courses.Course.course_id == course_id)).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    course.ta_id = new_ta.id
+    session.add(course)
+    session.commit()
+    session.refresh(course)
+
+    return {"message": f"New TA with ID {new_ta.id} has been assigned to course {course_id}"}
