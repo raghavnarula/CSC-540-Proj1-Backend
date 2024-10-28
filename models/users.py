@@ -2,6 +2,7 @@ from sqlmodel import Field, SQLModel, Relationship # type:ignore
 from typing import Optional, List
 from enum import Enum
 from .courses import Course
+from datetime import datetime
 
 class UserRole(str, Enum):
     admin = "admin"
@@ -14,5 +15,7 @@ class User(SQLModel, table=True):
     username: str = Field(index=True, unique=True)
     password: str
     role: UserRole
-
+    FirstName: str
+    LastName: str
+    CreationDate: datetime = Field(default_factory=datetime.utcnow)
     enrollments: List["Enrollment"] = Relationship(back_populates="student")
