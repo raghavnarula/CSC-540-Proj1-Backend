@@ -6,29 +6,35 @@ from ..models import textbooks   # Assuming chapter is the module with the chapt
 router = APIRouter()
 
 @router.post("/chapter/", response_model=textbooks.Chapter, tags=['chapter'], status_code=status.HTTP_200_OK)
-def create_chapter(request:Request, chapter: textbooks.Chapter, session: Session = Depends(get_session)):
-    # Optionally use a cookie for authorization or logging purposes
+def create_chapter(request: Request, chapter_data: textbooks.Chapter, session: Session = Depends(get_session)):
+    # Check user role from cookies
     user_role = request.cookies.get("user_role")
     if not user_role or user_role != "UserRole.admin":
         raise HTTPException(
-            status_code=400, 
-            detail="You are not allowed to create chapter"
+            status_code=400,
+            detail="You are not allowed to create a chapter"
         )
-    else:
-        # Check if the chapter already exists
-        existing_chapter = session.exec(select(chapter.chapter).where(chapter.chapter.chapter_id == chapter.chapter_id)).first()
-        if existing_chapter:
-            raise HTTPException(status_code=400, detail="chapter with this ID already exists")
-        session.add(chapter)
-        session.commit()
-        session.refresh(chapter)
-        return chapter
+    # Check if the chapter already exists
+    existing_chapter = session.exec(select(textbooks.Chapter).where(textbooks.Chapter.chapter_id == chapter_data.chapter_id)).first()
+    if existing_chapter:
+        raise HTTPException(status_code=400, detail="Chapter with this ID already exists")
+    
+    existing_textbook = session.exec(select(textbooks.Textbook).where(textbooks.Textbook.textbook_id == chapter_data.textbook_id)).first()
+    if not existing_textbook:
+        raise HTTPException(status_code=400, detail="Textbook with this ID does not exist")
+    
+    # Create a new chapter instance and add it to the session
+    new_chapter = textbooks.Chapter(**chapter_data.dict())
+    session.add(new_chapter)
+    session.commit()
+    session.refresh(new_chapter)    
+    return new_chapter
 
 @router.get("/chapter/{chapter_id}", response_model=textbooks.Chapter, tags=['chapter'])
-def read_chapter(request:Request, chapter_id: str, session: Session = Depends(get_session)):
-    chapter = session.get(chapter.chapter, chapter_id)
+def read_chapter(request: Request, chapter_id: str, session: Session = Depends(get_session)):
+    chapter = session.get(textbooks.Chapter, chapter_id)
     if not chapter:
-        raise HTTPException(status_code=404, detail="chapter not found")
+        raise HTTPException(status_code=404, detail="Chapter not found")
     return chapter
 
 @router.get("/chapter/", response_model=list[textbooks.Chapter], tags=["chapter"])
@@ -74,3 +80,4 @@ def delete_chapter(request:Request, chapter_id: str, session: Session = Depends(
         session.delete(db_chapter)
         session.commit()
         return {"message": "chapter deleted successfully"}
+

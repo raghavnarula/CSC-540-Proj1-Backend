@@ -13,5 +13,4 @@ class Course(SQLModel, table=True):
     end_date: str
     unique_token: str
     course_capacity: int
-
     enrollments: List["Enrollment"] = Relationship(back_populates="course")

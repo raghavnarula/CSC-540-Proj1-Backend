@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException #type:ignore
 from sqlmodel import Field, Session, SQLModel, create_engine, select #type:ignore
-from .routers import users,courses,login,textbooks
+from .routers import users,courses,login,textbooks,chapters
 from typing import Annotated
 from .database import *
 
@@ -17,7 +17,7 @@ app.include_router(login.router)
 app.include_router(users.router)
 app.include_router(courses.router)
 app.include_router(textbooks.router)
-
+app.include_router(chapters.router)
 # Root endpoint
 @app.get("/")
 def read_root():
